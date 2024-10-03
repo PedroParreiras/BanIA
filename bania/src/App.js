@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
+import { getStorage, ref, getDownloadURL } from 'firebase/storage';
 import './App.css';
 import { uploadImage } from './firebaseConfig';
+
+const storage = getStorage();  // Inicializa o Firebase Storage
 
 const App = () => {
   const [image, setImage] = useState(null);
   const [message, setMessage] = useState('');
   const [numTexts, setNumTexts] = useState(1);  // Número de textos a serem posicionados
-  const [generatedBanners, setGeneratedBanners] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -20,24 +22,25 @@ const App = () => {
     setLoading(true);
 
     try {
-      // Faz o upload da imagem para o Firebase
+      // Faz o upload da imagem para o Firebase Storage
       const imageUrl = await uploadImage(image);
 
-      // Envia a mensagem para a API do GPT e recebe os layouts
+      // Envia a mensagem para a API do GPT e salva os layouts no Firebase Storage
       const response = await fetch('/api/generate-banners', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message, numTexts }),  // Envia o número de textos para a API
+        body: JSON.stringify({ message, numTexts, imageUrl }),
       });
 
       if (!response.ok) {
         throw new Error(`Erro HTTP! status: ${response.status}`);
       }
 
+      // Layouts gerados e salvos no Firebase
       const data = await response.json();
-      setGeneratedBanners(data.banners);  // Recebe os layouts do GPT
+      console.log(data.message);  // Layouts gerados com sucesso
 
     } catch (error) {
       setError(error.message);
@@ -46,31 +49,49 @@ const App = () => {
     }
   };
 
-  const generateCanvas = (banner) => {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
+  const generateCanvas = async () => {
+    try {
+      // Baixar a imagem do Firebase Storage
+      const imageRef = ref(storage, `images/${image.name}`);
+      const imageUrl = await getDownloadURL(imageRef);
 
-    const img = new Image();
-    img.src = URL.createObjectURL(image);
+      // Baixar os layouts salvos no Firebase Storage
+      const layoutRef = ref(storage, 'layouts/unique_layouts.json');  // Use o nome gerado automaticamente na função da API
+      const layoutUrl = await getDownloadURL(layoutRef);
 
-    img.onload = () => {
-      canvas.width = img.width;
-      canvas.height = img.height;
-      ctx.drawImage(img, 0, 0);
+      const layoutsResponse = await fetch(layoutUrl);
+      const layouts = await layoutsResponse.json();
 
-      // Desenha os textos gerados pelo GPT no canvas
-      banner.textPositions.forEach((pos) => {
-        ctx.font = `${banner.textStyles.fontWeight} ${banner.textStyles.fontSize}px Arial`;
-        ctx.fillStyle = banner.textStyles.color;
-        ctx.fillText(pos.text, pos.left, pos.top);
+      // Criar o canvas e combinar a imagem com os textos
+      layouts.forEach((banner, index) => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        const img = new Image();
+        img.src = imageUrl;
+
+        img.onload = () => {
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx.drawImage(img, 0, 0);
+
+          // Desenha os textos nos locais gerados pelo GPT
+          banner.textPositions.forEach((pos) => {
+            ctx.font = `${banner.textStyles.fontWeight} ${banner.textStyles.fontSize}px Arial`;
+            ctx.fillStyle = banner.textStyles.color;
+            ctx.fillText(pos.text, pos.left, pos.top);
+          });
+
+          // Exibe ou faz download do canvas gerado
+          const link = document.createElement('a');
+          link.download = `banner_${index + 1}.png`;
+          link.href = canvas.toDataURL();
+          link.click();
+        };
       });
-
-      // Faz o download da imagem final com o texto
-      const link = document.createElement('a');
-      link.download = `banner_${banner.id}.png`;
-      link.href = canvas.toDataURL();
-      link.click();
-    };
+    } catch (error) {
+      console.error('Erro ao baixar e processar dados:', error);
+    }
   };
 
   return (
@@ -92,16 +113,9 @@ const App = () => {
         <button onClick={handleUpload} disabled={loading}>
           {loading ? 'Gerando...' : 'Gerar Banners'}
         </button>
+        <button onClick={generateCanvas}>Baixar Banners</button>
       </div>
       {error && <p className="error">{error}</p>}
-      <div className="banners-container">
-        {generatedBanners.map((banner) => (
-          <div key={banner.id} className="banner">
-            <img src={URL.createObjectURL(image)} alt={`Banner ${banner.id}`} />
-            <button onClick={() => generateCanvas(banner)}>Download Banner {banner.id}</button>
-          </div>
-        ))}
-      </div>
     </div>
   );
 };
