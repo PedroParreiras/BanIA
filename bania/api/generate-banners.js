@@ -7,46 +7,48 @@ const openai = new OpenAIApi(configuration);
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
-    const { imageUrl, message } = req.body;
+    const { message, numTexts } = req.body;  // Recebe o número de textos a serem posicionados (até 3)
 
-    if (!imageUrl || !message) {
-      return res.status(400).json({ message: 'Imagem e mensagem são obrigatórias.' });
+    if (!message || !numTexts) {
+      return res.status(400).json({ message: 'Mensagem e número de textos são obrigatórios.' });
     }
 
     try {
       const prompt = `
-        Gera 5 layouts de banner usando a palavra "${message}". 
-        Cada layout deve incluir a posição do texto, tamanho da fonte, cor e outras propriedades visuais. 
-        Os banners devem mesclar com a imagem fornecida: ${imageUrl}
-        O layout deve ser retornado em JSON no formato:
+        Gera 5 layouts de banners com base em banners já criados. 
+        Cada layout deve ter entre 1 e ${numTexts} posições de texto randomizadas.
+        O texto será a palavra: "${message}".
+        Cada banner deve incluir diferentes posições de texto e estilos aleatórios, com tamanhos, cores e posições únicas para cada banner.
+        Retorne no seguinte formato para cada banner:
         {
-          "textPosition": { "top": "50px", "left": "100px" },
-          "textStyle": { "fontSize": "24px", "fontWeight": "bold", "color": "#FFFFFF" },
-          "generatedText": "Texto gerado"
+          "textPositions": [
+            { "top": "randomizado", "left": "randomizado", "text": "Texto 1" },
+            { "top": "randomizado", "left": "randomizado", "text": "Texto 2" }
+          ],
+          "textStyles": { "fontSize": "aleatório", "fontWeight": "aleatório", "color": "aleatório" }
         }
       `;
 
       const gptResponse = await openai.createChatCompletion({
         model: 'gpt-4',
         messages: [{ role: 'user', content: prompt }],
-        max_tokens: 800,
+        max_tokens: 1000,
       });
 
       const content = gptResponse.data.choices[0].message.content;
 
       let bannersSpec;
       try {
-        bannersSpec = JSON.parse(content);
+        bannersSpec = JSON.parse(content);  // Garante que o JSON seja válido
       } catch (jsonError) {
         console.error("Erro ao parsear JSON:", jsonError);
         return res.status(500).json({ message: 'Erro ao processar a resposta da GPT.' });
       }
 
-      // Mapeia os banners para incluir o URL da imagem
+      // Adiciona um ID único para cada layout
       const banners = bannersSpec.map((banner, index) => ({
         ...banner,
-        imageUrl,
-        id: index + 1, // Adiciona um ID único para cada banner
+        id: index + 1,
       }));
 
       res.status(200).json({ banners });
