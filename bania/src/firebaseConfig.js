@@ -11,11 +11,19 @@ const firebaseConfig = {
   appId: process.env.REACT_APP_FIREBASE_APP_ID,
 };
 
+console.log('Initializing Firebase App with config:', firebaseConfig);
 const app = initializeApp(firebaseConfig);
 const storage = getStorage(app);
 
 export const uploadImage = async (image) => {
-  const imageRef = ref(storage, `images/${image.name}`);
-  await uploadBytes(imageRef, image);
-  return `images/${image.name}`;
+  try {
+    console.log('uploadImage initiated with image:', image.name);
+    const imageRef = ref(storage, `images/${image.name}`);
+    const snapshot = await uploadBytes(imageRef, image);
+    console.log('Image uploaded successfully:', snapshot.metadata.fullPath);
+    return snapshot.metadata.fullPath;
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    throw error;
+  }
 };

@@ -7,30 +7,39 @@
 
 body {
   font-family: 'Inter', sans-serif;
-  background-color: #f0f2f5;
+  background: linear-gradient(135deg, #f0f2f5, #c9d6ff);
   color: #333;
 }
 
 .App {
   max-width: 900px;
-  margin: 0 auto;
+  margin: 50px auto;
   text-align: center;
-  padding: 60px 20px;
-  background: #fff;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
+  padding: 60px 40px;
+  background: #ffffff;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+  border-radius: 20px;
+  transition: transform 0.3s ease;
+}
+
+.App:hover {
+  transform: translateY(-5px);
 }
 
 h1 {
   font-size: 3rem;
   margin-bottom: 40px;
   color: #5c67f2;
-  font-weight: 700;
+  font-weight: 800;
   text-transform: uppercase;
+  letter-spacing: 2px;
 }
 
 .upload-section {
   margin-bottom: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .upload-section input[type="file"],
@@ -38,83 +47,64 @@ h1 {
 .upload-section select {
   display: block;
   margin: 15px auto;
-  padding: 15px;
+  padding: 15px 20px;
   width: 90%;
-  max-width: 400px;
+  max-width: 500px;
   font-size: 1.1rem;
   border: 2px solid #e0e0e0;
-  border-radius: 8px;
+  border-radius: 10px;
   transition: all 0.3s ease;
+  background: #fafafa;
 }
 
 .upload-section input[type="file"]:hover,
 .upload-section input[type="text"]:hover,
 .upload-section select:hover {
   border-color: #5c67f2;
-  box-shadow: 0 4px 8px rgba(92, 103, 242, 0.1);
+  box-shadow: 0 6px 12px rgba(92, 103, 242, 0.2);
 }
 
 .upload-section button {
-  padding: 14px 40px;
+  padding: 14px 50px;
   font-size: 1.2rem;
-  background-color: #5c67f2;
+  background: linear-gradient(135deg, #5c67f2, #8d84f1);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
   margin-top: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .upload-section button:hover {
-  background-color: #4756c6;
-  transform: translateY(-2px);
+  background: linear-gradient(135deg, #4756c6, #6a75d4);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
 }
 
 .upload-section button:active {
-  background-color: #3b47a6;
+  background: linear-gradient(135deg, #3b47a6, #5a63b3);
   transform: translateY(0);
-}
-
-.error {
-  color: red;
-  margin-top: 20px;
-  font-size: 1.1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .upload-section button:disabled {
-  background-color: #c5c9f4;
+  background: #c5c9f4;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
-.upload-section select {
-  appearance: none;
-  background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0Ij4gPHBhdGggZD0iTTEyLjAwMDUsMTYuNzg1TDUuMTg0NTcsMTAuMDE5M0wwLDcuMjE5MTlMMCw3LjY4MDUxTDEyLjAwMDUsMjAuNTgyNEwyNCwyLjc2MDA5TDI0LDcuMjE5MTlMNS45NjI1NywxOC4zMzM0QzUuNDg4NTcsMTguNzA3Niw1LjAxMTMsMTguOTYsNC41MDA1LDguMjczMTRDOTkuMTIwMiw1LjMwOTUsMjAsNy41MzgzNSwyMy4yODUsMTAuNzg1WiIgZmlsbD0iI0NDQyIvPjwvc3ZnPg==') no-repeat right 10px center;
-  background-color: white;
+.error {
+  color: #e74c3c;
+  margin-top: 20px;
+  font-size: 1.1rem;
+  animation: fadeIn 0.5s ease-in-out;
 }
 
-.upload-section select:focus {
-  border-color: #5c67f2;
-  outline: none;
-}
-
-.upload-section input[type="file"]::file-selector-button {
-  padding: 12px 20px;
-  border: 2px solid #5c67f2;
-  background-color: #fff;
-  color: #5c67f2;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.upload-section input[type="file"]::file-selector-button:hover {
-  background-color: #5c67f2;
-  color: white;
-}
-
-.upload-section input[type="file"]::file-selector-button:active {
-  background-color: #4756c6;
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 footer {
@@ -127,8 +117,32 @@ footer {
 footer a {
   color: #5c67f2;
   text-decoration: none;
+  transition: color 0.3s ease;
 }
 
 footer a:hover {
+  color: #4756c6;
   text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .App {
+    padding: 40px 20px;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+  }
+
+  .upload-section input[type="file"],
+  .upload-section input[type="text"],
+  .upload-section select {
+    max-width: 100%;
+  }
+
+  .upload-section button {
+    width: 100%;
+    padding: 14px 20px;
+  }
 }
