@@ -2,7 +2,6 @@
 import { initializeApp } from 'firebase/app';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
-// Suas configurações do Firebase
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
   authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
@@ -12,11 +11,9 @@ const firebaseConfig = {
   appId: process.env.REACT_APP_FIREBASE_APP_ID
 };
 
-// Inicializa o Firebase
 const app = initializeApp(firebaseConfig);
 const storage = getStorage(app);
 
-// Função para fazer upload da imagem
 export const uploadImage = async (file) => {
   const storageRef = ref(storage, `images/${file.name}`);
   await uploadBytes(storageRef, file);

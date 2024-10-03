@@ -1,7 +1,5 @@
-// src/App.js
 import React, { useState } from 'react';
 import { uploadImage } from './firebaseConfig';
-import './App.css';
 
 const App = () => {
   const [image, setImage] = useState(null);
@@ -20,8 +18,10 @@ const App = () => {
     setLoading(true);
 
     try {
+      // Faz o upload da imagem para o Firebase
       const imageUrl = await uploadImage(image);
 
+      // Envia a palavra para a API GPT e recebe os layouts
       const response = await fetch('/api/generate-banners', {
         method: 'POST',
         headers: {
@@ -31,18 +31,41 @@ const App = () => {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Erro ao gerar banners.');
+        throw new Error(`Erro HTTP! status: ${response.status}`);
       }
 
       const data = await response.json();
-      setGeneratedBanners(data.banners);
-    } catch (err) {
-      console.error("Erro ao gerar banners:", err);
-      setError(err.message);
+      setGeneratedBanners(data.banners); // Definir os banners gerados
+    } catch (error) {
+      setError(error.message);
     } finally {
       setLoading(false);
     }
+  };
+
+  const generateCanvas = (banner) => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    const img = new Image();
+    img.src = banner.imageUrl;
+
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+
+      // Adiciona o texto ao canvas de acordo com a posição e estilo do layout
+      ctx.font = `${banner.textStyle.fontWeight} ${banner.textStyle.fontSize}px Arial`;
+      ctx.fillStyle = banner.textStyle.color;
+      ctx.fillText(banner.generatedText, banner.textPosition.left, banner.textPosition.top);
+
+      // Faz o download da imagem final
+      const link = document.createElement('a');
+      link.download = `banner_${banner.id}.png`;
+      link.href = canvas.toDataURL();
+      link.click();
+    };
   };
 
   return (
@@ -52,7 +75,7 @@ const App = () => {
         <input type="file" accept="image/*" onChange={(e) => setImage(e.target.files[0])} />
         <input
           type="text"
-          placeholder="Digite sua mensagem"
+          placeholder="Digite sua palavra"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
         />
@@ -64,19 +87,8 @@ const App = () => {
       <div className="banners-container">
         {generatedBanners.map((banner, index) => (
           <div key={index} className="banner">
-            <img src={banner.imageUrl} alt={`Banner ${index + 1}`} />
-            <div
-              className="banner-text"
-              style={{
-                top: banner.textPosition.top,
-                left: banner.textPosition.left,
-                fontSize: banner.textStyle.fontSize,
-                fontWeight: banner.textStyle.fontWeight,
-                color: banner.textStyle.color,
-              }}
-            >
-              {banner.generatedText}
-            </div>
+            <img src={banner.imageUrl} alt={`Banner ${index}`} />
+            <button onClick={() => generateCanvas(banner)}>Download Banner {index + 1}</button>
           </div>
         ))}
       </div>

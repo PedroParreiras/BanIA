@@ -7,24 +7,19 @@
 
 body {
   font-family: 'Inter', sans-serif;
-  background-color: #f0f2f5;
-  color: #333;
-  line-height: 1.6;
+  background-color: #f5f6f8;
 }
 
 .App {
-  max-width: 1200px;
+  max-width: 900px;
   margin: 0 auto;
   text-align: center;
-  padding: 50px 20px;
+  padding: 40px 20px;
 }
 
 h1 {
   font-size: 2.5rem;
   margin-bottom: 30px;
-  color: #333;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
 }
 
 .upload-section {
@@ -41,12 +36,6 @@ h1 {
   font-size: 1rem;
   border: 1px solid #ccc;
   border-radius: 5px;
-  transition: all 0.3s ease;
-}
-
-.upload-section input[type="file"]:hover,
-.upload-section input[type="text"]:hover {
-  border-color: #333;
 }
 
 .upload-section button {
@@ -58,33 +47,23 @@ h1 {
   border-radius: 5px;
   cursor: pointer;
   margin-top: 15px;
-  transition: all 0.3s ease;
-}
-
-.upload-section button:hover {
-  background-color: #4049c9;
 }
 
 .banners-container {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
   gap: 20px;
+  justify-content: center;
   margin-top: 40px;
 }
 
 .banner {
-  position: relative;
   width: 320px;
   height: 220px;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  position: relative;
+  border: 1px solid #ccc;
+  border-radius: 5px;
   overflow: hidden;
-  transition: transform 0.3s ease;
-}
-
-.banner:hover {
-  transform: scale(1.05);
 }
 
 .banner img {
@@ -93,34 +72,12 @@ h1 {
   object-fit: cover;
 }
 
-.banner-text {
-  position: absolute;
-  bottom: 20px;
-  left: 20px;
-  right: 20px;
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #fff;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-  word-wrap: break-word;
-}
-
-.error {
-  color: #e74c3c;
-  margin-top: 20px;
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-@media (max-width: 768px) {
-  .banner {
-    width: 100%;
-    height: auto;
-  }
-
-  .upload-section input[type="file"],
-  .upload-section input[type="text"] {
-    width: 100%;
-    max-width: 100%;
-  }
+.banner button {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
 }
