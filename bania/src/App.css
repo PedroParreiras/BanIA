@@ -1,7 +1,26 @@
-/* App.css */
+/* src/App.css */
 .App {
   text-align: center;
   padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.upload-section {
+  margin-bottom: 20px;
+}
+
+.upload-section input[type="file"],
+.upload-section input[type="text"] {
+  display: block;
+  margin: 10px auto;
+  padding: 10px;
+  width: 300px;
+}
+
+.upload-section button {
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
 }
 
 .banners-container {
@@ -16,6 +35,7 @@
   height: 200px;
   border: 1px solid #ccc;
   margin: 10px;
+  overflow: hidden;
 }
 
 .banner img {
@@ -24,6 +44,12 @@
   object-fit: cover;
 }
 
-.banner div {
+.banner-text {
   position: absolute;
+  /* Estilos dinâmicos serão aplicados inline */
+}
+
+.error {
+  color: red;
+  margin-top: 10px;
 }
