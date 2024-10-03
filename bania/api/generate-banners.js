@@ -1,5 +1,10 @@
-// api/generate-banners.js
-import { Configuration, OpenAIApi } from 'openai';
+const { Configuration, OpenAIApi } = require('openai'); // Use require se a import não estiver funcionando
+
+const configuration = new Configuration({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+const openai = new OpenAIApi(configuration);
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
@@ -8,11 +13,6 @@ export default async function handler(req, res) {
     if (!imageUrl || !message) {
       return res.status(400).json({ message: 'Imagem e mensagem são obrigatórias.' });
     }
-
-    const configuration = new Configuration({
-      apiKey: process.env.OPENAI_API_KEY,
-    });
-    const openai = new OpenAIApi(configuration);
 
     try {
       const prompt = `
@@ -24,14 +24,6 @@ export default async function handler(req, res) {
         1. Posição da imagem (ex: centro, canto superior esquerdo, etc.)
         2. Posição e estilo do texto (ex: abaixo da imagem, fonte grande e negrito, etc.)
         3. Texto gerado baseado na mensagem fornecida.
-
-        Responda em formato JSON com um array de objetos. Cada objeto deve ter:
-        {
-          "imageUrl": "URL_DA_IMAGEM",
-          "textPosition": { "top": "10px", "left": "20px" },
-          "textStyle": { "fontSize": "20px", "fontWeight": "bold", "color": "#FFFFFF" },
-          "generatedText": "Texto gerado"
-        }
       `;
 
       const gptResponse = await openai.createChatCompletion({
